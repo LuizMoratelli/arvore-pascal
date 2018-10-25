@@ -12,7 +12,7 @@ type
 var 
     op: Byte;
     arvore: ref;
-    novoValor: Integer;
+    valor, altura, qtdFolhas: Integer;
     
 procedure inicializaArvore(var arvore: ref);
 begin
@@ -38,9 +38,9 @@ procedure caminhaInfixado(ponteiro: ref);
 begin
     if (ponteiro <> nil) then
     begin
-        caminhaPrefixado(ponteiro^.esq);
+        caminhaInfixado(ponteiro^.esq);
         visita(ponteiro);
-        caminhaPrefixado(ponteiro^.dir);
+        caminhaInfixado(ponteiro^.dir);
     end;   
 end;
 
@@ -48,15 +48,15 @@ procedure caminhaPosfixado(ponteiro: ref);
 begin
     if (ponteiro <> nil) then
     begin
-        caminhaPrefixado(ponteiro^.esq);
-        caminhaPrefixado(ponteiro^.dir);
+        caminhaPosfixado(ponteiro^.esq);
+        caminhaPosfixado(ponteiro^.dir);
         visita(ponteiro);
     end;   
 end;
 
-procedure lerNovoValor(var novoValor: Integer);
+procedure lerValor(var novoValor: Integer);
 begin
-    writeln('Digite o valor à ser inserido: ');
+    writeln('Digite o valor desejado: ');
     read(novoValor);
 end;
 
@@ -83,6 +83,82 @@ begin
     end;
 end;
 
+procedure informaNivel(ponteiro: ref; valor: Integer; nivel: Integer);
+begin
+    if (ponteiro = nil) then
+    begin
+        writeln('Valor não encontrado!');
+    end
+    else 
+    begin
+        if (valor = ponteiro^.val) then
+        begin
+            writeln('Nível do valor (', valor, '): ', nivel);
+        end
+        else 
+        begin
+            nivel := nivel + 1;
+            if (valor < ponteiro^.val) then
+            begin
+                informaNivel(ponteiro^.esq, valor, nivel);
+            end
+            else
+            begin
+                informaNivel(ponteiro^.dir, valor, nivel);
+            end;
+        end;
+    end;
+end;
+
+procedure calculaAltura(ponteiro: ref; var altura: Integer);
+var alturaDir, alturaEsq: Integer;
+begin
+    if (ponteiro <> nil) then
+    begin
+        alturaDir := altura + 1;
+        alturaEsq := altura + 1;
+        calculaAltura(ponteiro^.dir, alturaDir);
+        calculaAltura(ponteiro^.esq, alturaEsq);
+        
+        if (alturaDir > alturaEsq) then
+        begin
+            altura := alturaDir;
+        end
+        else
+        begin
+            altura := alturaEsq;
+        end;
+    end;
+end;
+
+procedure informaFolhas(ponteiro: ref; var qtdFolhas: Integer);
+begin
+    if (ponteiro <> nil) then
+    begin
+        if ((ponteiro^.dir = nil) and (ponteiro^.esq = nil)) then
+        begin
+            writeln(ponteiro^.val, ' é uma folha');
+            qtdFolhas := qtdFolhas + 1;
+        end
+        else 
+        begin
+            informaFolhas(ponteiro^.dir, qtdFolhas);
+            informaFolhas(ponteiro^.esq, qtdFolhas);
+        end;
+    end;
+end;
+
+procedure informaAltura(ponteiro: ref; altura: Integer);
+begin
+    calculaAltura(arvore, altura);
+    writeln(altura);
+end;
+
+procedure informaQtdFolhas(qtdFolhas: Integer);
+begin
+    writeln('Essa árvore possui ', qtdFolhas, ' folhas.');
+end;
+
 begin
     op:= 1;
     inicializaArvore(arvore);
@@ -94,6 +170,9 @@ begin
         writeln('2 - Caminha In-fixado');
         writeln('3 - Caminha Pós-fixado');
         writeln('4 - Insere na Árvore');
+        writeln('5 - Nivel na Árvore');
+        writeln('6 - Altura da Árvore');
+        writeln('7 - Folhas da Árvore');
         readln(op);
         case op of 
             1: begin
@@ -106,8 +185,19 @@ begin
                 caminhaPosfixado(arvore);
                 end;
             4: begin
-                lerNovoValor(novoValor);
-                adicionaNodo(arvore, novoValor);
+                lerValor(valor);
+                adicionaNodo(arvore, valor);
+                end;
+            5: begin
+                lerValor(valor);
+                informaNivel(arvore, valor, 0);
+                end;
+            6: begin
+                informaAltura(arvore, altura);
+                end;
+            7: begin
+                informaFolhas(arvore, qtdFolhas);
+                informaQtdFolhas(qtdFolhas);
                 end;
         end;
     end;
