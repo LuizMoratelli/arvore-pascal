@@ -461,6 +461,7 @@ begin
                 informaAltura(arvore, altura);
                 end;
             7: begin
+            		qtdFolhas := 0;
                 informaFolhas(arvore, qtdFolhas);
                 informaQtdFolhas(qtdFolhas);
                 end;
