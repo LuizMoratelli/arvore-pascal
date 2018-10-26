@@ -269,6 +269,36 @@ begin
     end;
 end;
 
+{Auxilia na remoção do nó que foi trocado}
+procedure auxiliaRemoveNodo(var ponteiro: ref; direcao: String);
+begin
+    if (ponteiro <> nil) then
+    begin
+        if (direcao = 'dir') then
+        begin
+            if (ponteiro^.dir <> nil) then
+            begin
+                auxiliaRemoveNodo (ponteiro^.dir, 'dir');
+            end
+            else
+            begin
+                ponteiro := nil;
+            end;
+        end
+        else 
+        begin
+            if (ponteiro^.esq <> nil) then
+            begin
+                auxiliaRemoveNodo (ponteiro^.esq, 'esq');
+            end
+            else
+            begin
+                ponteiro := nil;
+            end;
+        end
+    end;
+end;
+
 {Remove um nó específico da árvore}
 procedure removeNodo(var arvore: ref; valor: Integer; var removido: Boolean);
 var troca: ref;
@@ -302,23 +332,22 @@ begin
                 begin
                     troca := troca^.dir;
                 end;
-                
                 arvore^.val := troca^.val;
                 
                 if (arvore^.esq^.val = troca^.val) then 
                 begin
                     if (arvore^.esq^.esq <> nil) then
                     begin
-                        arvore^.esq := nil;
+                        arvore^.esq := troca^.esq;
                     end
                     else 
                     begin
-                        arvore^.esq := troca^.esq;
+                        arvore^.esq := nil;
                     end;  
                 end
                 else
                 begin
-                    arvore^.esq^.dir := nil; 
+                    auxiliaRemoveNodo (arvore^.esq, 'dir'); 
                 end;
                 
                 troca := nil;
@@ -339,16 +368,16 @@ begin
                 begin
                     if (arvore^.dir^.dir <> nil) then
                     begin
-                        arvore^.dir := nil;
+                        arvore^.dir := troca^.dir;
                     end
                     else 
                     begin
-                        arvore^.dir := troca^.dir;
+                        arvore^.dir := nil;
                     end; 
                 end
                 else
                 begin
-                    arvore^.dir^.esq := nil; 
+                    auxiliaRemoveNodo (arvore^.dir, 'esq'); 
                 end;
                 
                 troca := nil;
