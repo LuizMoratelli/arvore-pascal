@@ -303,9 +303,20 @@ begin
                     troca := troca^.dir;
                 end;
                 
-                arvore^.esq := troca^.esq;                
-                arvore^.dir := troca^.dir;
                 arvore^.val := troca^.val;
+                
+                if (arvore^.esq^.val = troca^.val) then 
+                begin
+                    if (arvore^.esq^.esq <> nil) then
+                    begin
+                        arvore^.esq := nil;
+                    end
+                    else 
+                    begin
+                        arvore^.esq := troca^.esq;
+                    end;  
+                end;
+                
                 troca := nil;
                 removido := true;
             end
@@ -318,9 +329,20 @@ begin
                     troca := troca^.esq;
                 end;
                 
-                arvore^.esq := troca^.esq;                
-                arvore^.dir := troca^.dir;
                 arvore^.val := troca^.val;
+                
+                if (arvore^.dir^.val = troca^.val) then 
+                begin
+                    if (arvore^.dir^.dir <> nil) then
+                    begin
+                        arvore^.dir := nil;
+                    end
+                    else 
+                    begin
+                        arvore^.dir := troca^.dir;
+                    end;  
+                end;
+                
                 troca := nil;
                 removido := true;
             end;
