@@ -272,25 +272,32 @@ end;
 {Auxilia na remoção do nó que foi trocado}
 procedure auxiliaRemoveNodo(var ponteiro: ref; direcao: String);
 begin
+    {Mantém na recursividade enquanto o ponteiro for diferente de nulo}
     if (ponteiro <> nil) then
     begin
+        {Se a direção é direita (sub-arvore da esquerda)}
         if (direcao = 'dir') then
         begin
+            {Locomove até enquanto tiver próximo valor à direita}
             if (ponteiro^.dir <> nil) then
             begin
                 auxiliaRemoveNodo (ponteiro^.dir, 'dir');
             end
+            {Quando não tiver mais, limpa o atual}
             else
             begin
                 ponteiro := nil;
             end;
         end
+        {Se a direção é esquerda (sub-arvore da direita)}
         else 
         begin
+            {Locomove até enquanto tiver próximo valor à esquerda}
             if (ponteiro^.esq <> nil) then
             begin
                 auxiliaRemoveNodo (ponteiro^.esq, 'esq');
             end
+            {Quando não tiver mais, limpa o atual}
             else
             begin
                 ponteiro := nil;
@@ -327,15 +334,20 @@ begin
             {Caso contrario se tiver uma filho à esquerda, troca pelo elemento mais à direita desse filho}
             else if (arvore^.esq <> nil) then
             begin
+                {troca o mais à direita da sub-arvore da esquerda}
                 troca := arvore^.esq;
                 while (troca^.dir <> nil) do
                 begin
                     troca := troca^.dir;
                 end;
+                
+                {O nó que será retirado recebe o valor do que ficará no lugar}
                 arvore^.val := troca^.val;
                 
+                {Se o nó à esquerda for o que será trocado}
                 if (arvore^.esq^.val = troca^.val) then 
                 begin
+                    {Se houver um elemento à esquerda do elemento à esquerda ele é recebido pelo nó de troca}
                     if (arvore^.esq^.esq <> nil) then
                     begin
                         arvore^.esq := troca^.esq;
@@ -356,16 +368,20 @@ begin
             {Caso contrario se tiver um filho à direita, troca pelo elemento mais à esquerda desse filho}
             else if (arvore^.dir <> nil) then
             begin
+                {troca o mais à esquerda da sub-arvore da direita}
                 troca := arvore^.dir;
                 while (troca^.esq <> nil) do
                 begin
                     troca := troca^.esq;
                 end;
                 
+                {O nó que será retirado recebe o valor do que ficará no lugar}
                 arvore^.val := troca^.val;
                 
+                {Se o nó à direita for o que será trocado}
                 if (arvore^.dir^.val = troca^.val) then 
                 begin
+                    {Se houver um elemento à direita do elemento à direita ele é recebido pelo nó de troca}
                     if (arvore^.dir^.dir <> nil) then
                     begin
                         arvore^.dir := troca^.dir;
