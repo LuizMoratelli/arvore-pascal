@@ -15,16 +15,19 @@ var
     valor, altura, qtdFolhas: Integer;
     completa: Boolean;
     
+{Inicializa-se à árvore}
 procedure inicializaArvore(var arvore: ref);
 begin
     arvore := nil;
 end;
     
+{Imprime o valor do ponteiro}
 procedure visita(ponteiro: ref);
 begin
     writeln(ponteiro^.val);
 end;
 
+{Exibe o valor, anda à esquerda e depois à direita}
 procedure caminhaPrefixado(ponteiro: ref);
 begin
     if (ponteiro <> nil) then
@@ -35,6 +38,7 @@ begin
     end;   
 end;
 
+{Anda à esquerda, exibe o valor e depois à direita}
 procedure caminhaInfixado(ponteiro: ref);
 begin
     if (ponteiro <> nil) then
@@ -45,6 +49,7 @@ begin
     end;   
 end;
 
+{Anda à esquerda, à direita e depois exibe o valor}
 procedure caminhaPosfixado(ponteiro: ref);
 begin
     if (ponteiro <> nil) then
@@ -55,14 +60,17 @@ begin
     end;   
 end;
 
+{Lê valor do usuário}
 procedure lerValor(var novoValor: Integer);
 begin
     writeln('Digite o valor desejado: ');
     read(novoValor);
 end;
 
+{Adiciona um novo nó à arvore}
 procedure adicionaNodo(var arvore: ref; valor: Integer);
 begin
+    {Se é um espaço vazio pode adicionar}
     if (arvore = nil) then
     begin
         new(arvore);
@@ -70,39 +78,50 @@ begin
         arvore^.dir := nil;
         arvore^.esq := nil;
     end
+    {Caso contrário procura pelo local adequado de inserção}
     else 
     begin
+        {Se o valor à ser inserido for menor que o valor atual da árvore, locomove-se à esquerda}
         if (valor < arvore^.val) then
         begin
             adicionaNodo(arvore^.esq, valor);
         end
+        {Se o valor à ser inserido for maior que o valor atual da árvore, locomove-se à direita}
         else if (valor > arvore^.val) then
         begin
             adicionaNodo(arvore^.dir, valor);
         end;
+        {Em tese, não são adicionados valores repetidos à uma árvore}
         // E se for igual?
     end;
 end;
 
+{Informa o nível de um nó (distância entre a raíz e o nó)}
 procedure informaNivel(ponteiro: ref; valor: Integer; nivel: Integer);
 begin
+    {Se o ponteiro chegar à um valor vazio, o valor de busca não foi encontrado}
     if (ponteiro = nil) then
     begin
         writeln('Valor não encontrado!');
     end
     else 
     begin
+        {Caso o valor de busca seja igual ao valor atual é exibido seu nível}
         if (valor = ponteiro^.val) then
         begin
             writeln('Nível do valor (', valor, '): ', nivel);
         end
+        {Caso contrário, locomove-se na árvore para encontrá-lo}
         else 
         begin
             nivel := nivel + 1;
+            
+            {Se o valor de busca for menor que o valor atual, locomove-se à esquerda}
             if (valor < ponteiro^.val) then
             begin
                 informaNivel(ponteiro^.esq, valor, nivel);
             end
+            {Se o valor de busca for maior que o valor atual, locomove-se à direita}
             else
             begin
                 informaNivel(ponteiro^.dir, valor, nivel);
@@ -111,15 +130,20 @@ begin
     end;
 end;
 
+{Calcula o nível de um ponteiro}
 procedure calculaNivel(ponteiro: ref; valor: Integer; var nivel: Integer);
 begin
+    {Caso o valor seja diferente do valor de busca, é necessário buscá-lo}
     if (valor <> ponteiro^.val) then
     begin
         nivel := nivel + 1;
+        
+        {Se o valor de busca for menor que o valor atual, locomove-se à esquerda}
         if (valor < ponteiro^.val) then
-        begin
+        begin   
             calculaNivel(ponteiro^.esq, valor, nivel);
         end
+        {Se o valor de busca for maior que o valor atual, locomove-se à direita}
         else
         begin
             calculaNivel(ponteiro^.dir, valor, nivel);
@@ -127,16 +151,20 @@ begin
     end;
 end;
 
+{Calcula à altura da árvore}
 procedure calculaAltura(ponteiro: ref; var altura: Integer);
 var alturaDir, alturaEsq: Integer;
 begin
+    {Se o ponteiro atual existir}
     if (ponteiro <> nil) then
     begin
+        {Calcula a altura da àrvore da esquerda e direita adicionando-as em 1 -> http://prntscr.com/lal8ny}    
         alturaDir := altura + 1;
         alturaEsq := altura + 1;
         calculaAltura(ponteiro^.dir, alturaDir);
         calculaAltura(ponteiro^.esq, alturaEsq);
         
+        {O que mais possuir altura será definido como a nova altura}
         if (alturaDir > alturaEsq) then
         begin
             altura := alturaDir;
@@ -148,15 +176,19 @@ begin
     end;
 end;
 
+{Imprime o valor das folhas}
 procedure informaFolhas(ponteiro: ref; var qtdFolhas: Integer);
 begin
+    {Se não for nulo}
     if (ponteiro <> nil) then
     begin
+        {E não tiver folhas: é uma folha}
         if ((ponteiro^.dir = nil) and (ponteiro^.esq = nil)) then
         begin
             writeln(ponteiro^.val, ' é uma folha');
             qtdFolhas := qtdFolhas + 1;
         end
+        {Caso contrário, busca pelas folhas}
         else 
         begin
             informaFolhas(ponteiro^.dir, qtdFolhas);
@@ -165,54 +197,63 @@ begin
     end;
 end;
 
+{Imprime a altura da árvore}
 procedure informaAltura(ponteiro: ref; altura: Integer);
 begin
     calculaAltura(arvore, altura);
     writeln(altura);
 end;
 
+{Imprime a quantidade de folhas}
 procedure informaQtdFolhas(qtdFolhas: Integer);
 begin
     writeln('Essa árvore possui ', qtdFolhas, ' folhas.');
 end;
 
-procedure verificaCompleta(raiz, arvore: ref; var completa: Boolean; altura: Integer);
+{Verifica se a árvore é completa}
+procedure verificaCompleta(raiz, ponteiro: ref; var completa: Boolean; altura: Integer);
 var nivelPonteiro: Integer;
 begin
-    if (arvore <> nil) then
+    {Se o ponteiro não for nulo, verifica seu nível}
+    if (ponteiro <> nil) then
     begin
         nivelPonteiro := 1;
-        calculaNivel(raiz, arvore^.val, nivelPonteiro);
+        calculaNivel(raiz, ponteiro^.val, nivelPonteiro);
     end;
     
-    if (arvore = nil) then
+    {Se o ponteiro for nulo, esse ponteiro é "completo"}
+    if (ponteiro = nil) then
     begin
         completa := true;
         exit;
     end;
     
-
-    if ((arvore^.dir = nil) and (arvore^.esq = nil) and (altura = nivelPonteiro)) then
+    {Se tiver ambos os filhos e for da altura final da árvore esse ponteiro é "completo"}
+    if ((ponteiro^.dir = nil) and (ponteiro^.esq = nil) and (altura = nivelPonteiro)) then
     begin
         completa := true;
         exit;
     end;
 
-    if ((arvore^.dir <> nil) and (arvore^.esq <> nil)) then
+    {Se nenhum dos filhos for nulo, continua percorrendo}
+    if ((ponteiro^.dir <> nil) and (ponteiro^.esq <> nil)) then
     begin
-        verificaCompleta(raiz, arvore^.dir, completa, altura);
-
+        verificaCompleta(raiz, ponteiro^.dir, completa, altura);
+    
+        {Apenas percorre o outro lado caso o primeiro não seja incompleto}
         if (completa = true) then
         begin
-            verificaCompleta(raiz, arvore^.esq, completa, altura);
+            verificaCompleta(raiz, ponteiro^.esq, completa, altura);
         end;
 
         exit;
     end;
-
+    
+    {Caso não entre em nenhum caso acima, o ponteiro é "incompleto", ocasionando em uma árvore incompleta}
     completa := false;
 end;
 
+{Informa se a árvore é completa ou não}
 procedure informaCompleta(arvore: ref; var completa: Boolean; altura: Integer);
 begin
     completa := false;
