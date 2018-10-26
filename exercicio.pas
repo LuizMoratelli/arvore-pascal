@@ -13,7 +13,7 @@ var
     op: Byte;
     arvore: ref;
     valor, altura, qtdFolhas: Integer;
-    completa: Boolean;
+    completa, removido: Boolean;
     
 {Inicializa-se à árvore}
 procedure inicializaArvore(var arvore: ref);
@@ -201,7 +201,7 @@ end;
 procedure informaAltura(ponteiro: ref; altura: Integer);
 begin
     calculaAltura(arvore, altura);
-    writeln(altura);
+    writeln('A altura da árvore é: ', altura);
 end;
 
 {Imprime a quantidade de folhas}
@@ -269,6 +269,80 @@ begin
     end;
 end;
 
+{Remove um nó específico da árvore}
+procedure removeNodo(var arvore: ref; valor: Integer; var removido: Boolean);
+var troca: ref;
+begin  
+    {Se o ponteiro atual não for nulo}
+    if (arvore <> nil) then
+    begin
+        {Caminha para direita caso o valor de busca seja maior que o atual}
+        if(valor > arvore^.val) then
+        begin
+            removeNodo(arvore^.dir, valor, removido);
+        end
+        {Caminha para esquerda caso o valor de busca seja menor que o atual}
+        else if (valor < arvore^.val) then
+        begin
+            removeNodo(arvore^.esq, valor, removido);
+        end
+        else 
+        begin 
+            {Remove se for uma folha}
+            if ((arvore^.esq = nil) and (arvore^.dir = nil)) then
+            begin
+                removido := true;
+                arvore := nil;
+            end
+            {Caso contrario se tiver uma filho à esquerda, troca pelo elemento mais à direita desse filho}
+            else if (arvore^.esq <> nil) then
+            begin
+                troca := arvore^.esq;
+                while (troca^.dir <> nil) do
+                begin
+                    troca := troca^.dir;
+                end;
+                
+                arvore^.esq := troca^.esq;                
+                arvore^.dir := troca^.dir;
+                arvore^.val := troca^.val;
+                troca := nil;
+                removido := true;
+            end
+            {Caso contrario se tiver um filho à direita, troca pelo elemento mais à esquerda desse filho}
+            else if (arvore^.dir <> nil) then
+            begin
+                troca := arvore^.dir;
+                while (troca^.esq <> nil) do
+                begin
+                    troca := troca^.esq;
+                end;
+                
+                arvore^.esq := troca^.esq;                
+                arvore^.dir := troca^.dir;
+                arvore^.val := troca^.val;
+                troca := nil;
+                removido := true;
+            end;
+        end;
+    end;
+end;
+
+{Informa se o valor solicitado pode ser removido}
+procedure informaRemovido(var arvore: ref; valor: Integer; removido: Boolean);
+begin
+    removeNodo(arvore, valor, removido);
+    
+    if (removido = true) then
+    begin
+        writeln('Valor removido com sucesso!');
+    end
+    else 
+    begin
+        writeln('Valor não encontrado!');
+    end;
+end;
+
 begin
     op:= 1;
     inicializaArvore(arvore);
@@ -284,6 +358,7 @@ begin
         writeln('6 - Altura da Árvore');
         writeln('7 - Folhas da Árvore');
         writeln('8 - Verifica se a Árvore é completa');
+        writeln('9 - Remove da Árvore');
         readln(op);
         case op of 
             1: begin
@@ -313,6 +388,10 @@ begin
             8: begin
                 calculaAltura(arvore, altura);
                 informaCompleta(arvore, completa, altura);
+            end;
+            9: begin
+                lerValor(valor);
+                informaRemovido(arvore, valor, removido);
             end;
         end;
     end;
