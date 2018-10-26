@@ -305,19 +305,20 @@ begin
                 
                 arvore^.val := troca^.val;
                 
-                {Se o nó à direita for igual o valor de troca}
                 if (arvore^.esq^.val = troca^.val) then 
                 begin
-                    {Se o nó à esquerda não possuir um filho à esquerda define a esquerda da sub-árvore como nula}
                     if (arvore^.esq^.esq <> nil) then
                     begin
                         arvore^.esq := nil;
                     end
-                    {Caso contrário, a esquerda da sub-árvore é definida como o filho da esquerda do nó à esquerda}
                     else 
                     begin
                         arvore^.esq := troca^.esq;
                     end;  
+                end
+                else
+                begin
+                    arvore^.esq^.dir := nil; 
                 end;
                 
                 troca := nil;
@@ -334,19 +335,20 @@ begin
                 
                 arvore^.val := troca^.val;
                 
-                {Se o nó à direita for igual o valor de troca}
                 if (arvore^.dir^.val = troca^.val) then 
                 begin
-                    {Se o nó à direita não possuir um filho à direita define a direita da sub-árvore como nula}
                     if (arvore^.dir^.dir <> nil) then
                     begin
                         arvore^.dir := nil;
                     end
-                    {Caso contrário, a direita da sub-árvore é definida como o filho da direita do nó à direita}
                     else 
                     begin
                         arvore^.dir := troca^.dir;
-                    end;  
+                    end; 
+                end
+                else
+                begin
+                    arvore^.dir^.esq := nil; 
                 end;
                 
                 troca := nil;
