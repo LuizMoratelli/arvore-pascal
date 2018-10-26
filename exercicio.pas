@@ -227,7 +227,7 @@ begin
         completa := true;
         exit;
     end;
-    
+     
     {Se tiver ambos os filhos e for da altura final da árvore esse ponteiro é "completo"}
     if ((ponteiro^.dir = nil) and (ponteiro^.esq = nil) and (altura = nivelPonteiro)) then
     begin
@@ -457,6 +457,7 @@ begin
                 informaNivel(arvore, valor, 1);
                 end;
             6: begin
+            		altura := 0;
                 informaAltura(arvore, altura);
                 end;
             7: begin
@@ -464,14 +465,16 @@ begin
                 informaQtdFolhas(qtdFolhas);
                 end;
             8: begin
+            		altura := 0;
                 calculaAltura(arvore, altura);
                 informaCompleta(arvore, completa, altura);
-            end;
+            		end;
             9: begin
                 lerValor(valor);
                 informaRemovido(arvore, valor, removido);
-            end;
+            		end;
         end;
+        
         writeln('<Enter> para continuar');
         readkey;
     end;
