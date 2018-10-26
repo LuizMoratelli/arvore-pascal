@@ -437,12 +437,15 @@ begin
         readln(op);
         case op of 
             1: begin
+            		writeln('Caminho Prefixado: ');
                 caminhaPrefixado(arvore);
                 end;
             2: begin
+            		writeln('Caminho Infixado: ');
                 caminhaInfixado(arvore);
                 end;
             3: begin
+            		writeln('Caminho Pósfixado: ');
                 caminhaPosfixado(arvore);
                 end;
             4: begin
@@ -469,5 +472,7 @@ begin
                 informaRemovido(arvore, valor, removido);
             end;
         end;
+        writeln('<Enter> para continuar');
+        readkey;
     end;
 end.
