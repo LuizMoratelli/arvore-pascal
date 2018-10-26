@@ -13,6 +13,7 @@ var
     op: Byte;
     arvore: ref;
     valor, altura, qtdFolhas: Integer;
+    completa: Boolean;
     
 procedure inicializaArvore(var arvore: ref);
 begin
@@ -110,6 +111,22 @@ begin
     end;
 end;
 
+procedure calculaNivel(ponteiro: ref; valor: Integer; var nivel: Integer);
+begin
+    if (valor <> ponteiro^.val) then
+    begin
+        nivel := nivel + 1;
+        if (valor < ponteiro^.val) then
+        begin
+            calculaNivel(ponteiro^.esq, valor, nivel);
+        end
+        else
+        begin
+            calculaNivel(ponteiro^.dir, valor, nivel);
+        end;
+    end;
+end;
+
 procedure calculaAltura(ponteiro: ref; var altura: Integer);
 var alturaDir, alturaEsq: Integer;
 begin
@@ -159,6 +176,58 @@ begin
     writeln('Essa árvore possui ', qtdFolhas, ' folhas.');
 end;
 
+procedure verificaCompleta(raiz, arvore: ref; var completa: Boolean; altura: Integer);
+var nivelPonteiro: Integer;
+begin
+    if (arvore <> nil) then
+    begin
+        nivelPonteiro := 1;
+        calculaNivel(raiz, arvore^.val, nivelPonteiro);
+    end;
+    
+    if (arvore = nil) then
+    begin
+        completa := true;
+        exit;
+    end;
+    
+
+    if ((arvore^.dir = nil) and (arvore^.esq = nil) and (altura = nivelPonteiro)) then
+    begin
+        completa := true;
+        exit;
+    end;
+
+    if ((arvore^.dir <> nil) and (arvore^.esq <> nil)) then
+    begin
+        verificaCompleta(raiz, arvore^.dir, completa, altura);
+
+        if (completa = true) then
+        begin
+            verificaCompleta(raiz, arvore^.esq, completa, altura);
+        end;
+
+        exit;
+    end;
+
+    completa := false;
+end;
+
+procedure informaCompleta(arvore: ref; var completa: Boolean; altura: Integer);
+begin
+    completa := false;
+    verificaCompleta(arvore, arvore, completa, altura);
+    
+    if (completa = true) then
+    begin
+        writeln('Árvore completa!');
+    end
+    else
+    begin
+         writeln('Árvore incompleta!');
+    end;
+end;
+
 begin
     op:= 1;
     inicializaArvore(arvore);
@@ -173,6 +242,7 @@ begin
         writeln('5 - Nivel na Árvore');
         writeln('6 - Altura da Árvore');
         writeln('7 - Folhas da Árvore');
+        writeln('8 - Verifica se a Árvore é completa');
         readln(op);
         case op of 
             1: begin
@@ -190,7 +260,7 @@ begin
                 end;
             5: begin
                 lerValor(valor);
-                informaNivel(arvore, valor, 0);
+                informaNivel(arvore, valor, 1);
                 end;
             6: begin
                 informaAltura(arvore, altura);
@@ -199,6 +269,10 @@ begin
                 informaFolhas(arvore, qtdFolhas);
                 informaQtdFolhas(qtdFolhas);
                 end;
+            8: begin
+                calculaAltura(arvore, altura);
+                informaCompleta(arvore, completa, altura);
+            end;
         end;
     end;
 end.
