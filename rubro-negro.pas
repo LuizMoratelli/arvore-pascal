@@ -508,12 +508,23 @@ begin
     end;
 end;
 
+{Elimina todos os nós da arvore}
+procedure limpaArvore(var arvore: ref);
+begin
+    if (arvore <> nil) then
+    begin
+        limpaArvore(arvore^.esq);
+        limpaArvore(arvore^.dir);
+        dispose(arvore);
+    end;
+end;
+
 {Faz todos os procedimentos de organização e coloração da arvore}
 procedure executaBalanceamentoArvore(var arvore: ref; var listaNos: arrayInt; var cListaNos: Integer);
 begin
     cListaNos := 0;
     listarNos(arvore, listaNos, cListaNos);
-    { Fazer função pra remove tudo }
+    limpaArvore(arvore);
     arvore := nil;
     balancearArvore(arvore, listaNos, 1, cListaNos);
     colorirArvore(arvore, arvore);
