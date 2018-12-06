@@ -9,7 +9,7 @@ type
         val: Integer;
         next: ref;
     end;
-    arrayNode = array[ArrayI..ArrayF] of ref;
+    arrayNode = array[ArrayI..ArrayF] of ^node;
 var 
     listaHash: arrayNode;
     ponteiro: ref;
@@ -17,6 +17,7 @@ var
     op: Byte;
     value: Integer;
 
+{Inicia o Array apontando os ponteiros para nil}
 procedure iniciarListaHash(var listaHash: arrayNode);
 var i: Integer;
 begin
@@ -26,12 +27,15 @@ begin
     end;
 end;
 
+{Insere o valor informado na posição correta}
 procedure insereHash(var ponteiro: ref; value: Integer);
 begin
+    {Se não for uma posição nula continua andando pela lista (recursividade)}
     if (ponteiro <> nil) then
     begin
         insereHash(ponteiro^.next, value);
     end
+    {Se for um espaço nulo, insere}
     else 
     begin
         new(ponteiro);
@@ -40,13 +44,16 @@ begin
     end;
 end;
 
+{Verifica em qual lista encadeada do array o valor desejado será inserido}
 procedure verificaInsereHash(var listaHash: arrayNode; value: Integer);
 var resto: Integer;
 begin
+    {Será inserido na posição de acordo com o resto}
     resto := value MOD (ArrayF + 1);
     insereHash(listaHash[resto], value);
 end;
 
+{Imprime todos os valores da lista encadeada}
 procedure imprimePosicaoHash(ponteiro: ref);
 begin
     if (ponteiro <> nil) then
@@ -56,6 +63,7 @@ begin
     end;
 end;
 
+{Imprime todas as listas de acordo com o array}
 procedure listagemHash(listaHash: arrayNode);
 var i: Integer;
 begin
@@ -67,19 +75,26 @@ begin
     end;
 end;
 
+{Remove }
 procedure removeHash(var ponteiro: ref; value: Integer);
 var ponteiroAux: ref;
 begin
+    {Caso o ponteiro atual não seja nulo}
     if (ponteiro <> nil) then
     begin
+        {Se o valor for o procurado para deletar}
         if (ponteiro^.val = value) then
         begin
+            {Auxiliar captura nó à ser deletado}
             ponteiroAux := ponteiro;
+            {A referência do ponteiro passar a ser o próximo da lista}
             ponteiro := ponteiro^.next;
+            {Retirado da memória o valor desejado}
             dispose(ponteiroAux);
         end
         else
         begin
+            {Chama recursivamente até encontrar o valor desejado}
             removeHash(ponteiro^.next, value);
         end;
     end
@@ -89,6 +104,7 @@ begin
     end;
 end;
 
+{Indica para função de remoção em qual lista encadeada o valor está presente}
 procedure verificaRemoveHash(var listaHash: arrayNode; value: Integer);
 var resto: Integer;
 begin
@@ -96,6 +112,7 @@ begin
     removeHash(listaHash[resto], value);
 end;
 
+{lê uma entrada do usuário}
 procedure lerValor(var value: Integer);
 begin
     writeln('Digite o valor desejado: ');
