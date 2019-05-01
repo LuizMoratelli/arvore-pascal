@@ -7,6 +7,7 @@ type
         dir: ref;
         esq: ref;
         val: Integer;
+        cor: Byte;
     end;
     
 var 
@@ -14,6 +15,7 @@ var
     arvore: ref;
     valor, altura, qtdFolhas: Integer;
     completa, removido: Boolean;
+    arvoreAux: ref;
     
 {Inicializa-se à árvore}
 procedure inicializaArvore(var arvore: ref);
@@ -24,7 +26,9 @@ end;
 {Imprime o valor do ponteiro}
 procedure visita(ponteiro: ref);
 begin
+    TextColor(ponteiro^.cor);
     writeln(ponteiro^.val);
+    TextColor(WHITE);
 end;
 
 {Exibe o valor, anda à esquerda e depois à direita}
@@ -403,6 +407,75 @@ begin
     end;
 end;
 
+{Rotação para a direita}
+procedure rotacaoDireita(var raiz: ref);
+var ponteiroAux: ref;
+begin
+    ponteiroAux := raiz^.esq;
+    raiz^.esq := ponteiroAux^.dir;
+    ponteiroAux^.dir := raiz;
+    raiz := ponteiroAux;
+end;
+
+{Rotação para a esquerda}
+procedure rotacaoEsquerda(var raiz: ref);
+var ponteiroAux: ref;
+begin
+    ponteiroAux := raiz^.dir;
+    raiz^.dir := ponteiroAux^.esq;
+    ponteiroAux^.esq := raiz;
+    raiz := ponteiroAux;
+end;
+
+{Verifica se está balanceada}
+procedure calculaBalanceamento(arvore: ref; var altura: integer);
+var alturaEsquerda, alturaDireita: Integer;
+begin
+    if (arvore <> nil) then
+    begin
+        alturaEsquerda := 0;
+        alturaDireita := 0;
+        {Calcula altura da subarvore da esquerda}
+        calculaAltura(arvore^.esq, alturaEsquerda);
+        {Calcula altura da subarvore da direita}
+        calculaAltura(arvore^.dir, alturaDireita);
+        altura := alturaDireita - alturaEsquerda;
+    end;
+end;
+
+{Efetua o balanceamento da árvore}
+procedure balancoArvore(var arvore: ref);
+var variacaoBalanceamento, variacaoBalanceamentoDireita, variacaoBalanceamentoEsquerda: Integer;
+begin
+    calculaBalanceamento(arvore, variacaoBalanceamento);
+
+    {Se a subarvore esquerda for maior que a direita em mais de 1 de diferença}
+    if (variacaoBalanceamento < -1) then 
+    begin
+        calculaBalanceamento(arvore^.esq, variacaoBalanceamentoEsquerda);
+
+        {Se a variacao de balanceamento da subarvore da esquerda for maior que 0}
+        if (variacaoBalanceamentoEsquerda > 0) then
+        begin
+            rotacaoEsquerda(arvore);
+        end;
+        rotacaoDireita(arvore);
+
+    end
+    {Se a subarvore direita for maior que a esquerda em mais de 1 de diferença}
+    else if (variacaoBalanceamento > 1) then
+    begin
+        calculaBalanceamento(arvore^.dir, variacaoBalanceamentoDireita);
+
+        {Se a variacao de balanceamento da subarvore da direita for menor que 0}
+        if (variacaoBalanceamentoDireita < 0) then
+        begin
+            rotacaoDireita(arvore);
+        end;
+        rotacaoEsquerda(arvore);
+    end;
+end;
+
 {Informa se o valor solicitado pode ser removido}
 procedure informaRemovido(var arvore: ref; valor: Integer; removido: Boolean);
 begin
@@ -418,7 +491,55 @@ begin
     end;
 end;
 
+{Retorna o nível para usá-lo na coloração}
+procedure retornaNivel(ponteiro: ref; valor: Integer; var nivel: Integer);
 begin
+    if (ponteiro <> nil) then
+    begin
+        {Caso o valor de busca seja igual ao valor atual é exibido seu nível}
+        if (valor <> ponteiro^.val) then
+        begin
+            nivel := nivel + 1;
+            
+            {Se o valor de busca for menor que o valor atual, locomove-se à esquerda}
+            if (valor < ponteiro^.val) then
+            begin
+                retornaNivel(ponteiro^.esq, valor, nivel);
+            end
+            {Se o valor de busca for maior que o valor atual, locomove-se à direita}
+            else
+            begin
+                retornaNivel(ponteiro^.dir, valor, nivel);
+            end;
+        end;
+    end;
+end;
+
+{Função para colorir a arvore}
+procedure colorirArvore(var arvore: ref; raiz: ref);
+var nivel: Integer;
+begin
+    nivel := 0;
+    if (arvore <> nil) then
+    begin
+        retornaNivel(raiz, arvore^.val, nivel);
+        if (nivel MOD 2 = 0) then 
+        begin
+            arvore^.cor := BLACK;
+        end
+        else
+        begin
+            arvore^.cor := RED;
+        end;
+
+        colorirArvore(arvore^.esq, raiz);
+        colorirArvore(arvore^.dir, raiz);
+    end;
+end;
+
+begin
+    TextColor(WHITE);
+    TextBackground(BLUE);
     op:= 1;
     inicializaArvore(arvore);
     while op <> 0 do
@@ -437,43 +558,47 @@ begin
         readln(op);
         case op of 
             1: begin
-            		writeln('Caminho Prefixado: ');
+                writeln('Caminho Prefixado: ');
                 caminhaPrefixado(arvore);
-                end;
+            end;
             2: begin
-            		writeln('Caminho Infixado: ');
+                writeln('Caminho Infixado: ');
                 caminhaInfixado(arvore);
-                end;
+            end;
             3: begin
-            		writeln('Caminho Pósfixado: ');
+                writeln('Caminho Pósfixado: ');
                 caminhaPosfixado(arvore);
-                end;
+            end;
             4: begin
                 lerValor(valor);
                 adicionaNodo(arvore, valor);
-                end;
+                balancoArvore(arvore);
+                colorirArvore(arvore, arvore);
+            end;
             5: begin
                 lerValor(valor);
                 informaNivel(arvore, valor, 1);
-                end;
+            end;
             6: begin
-            		altura := 0;
+                altura := 0;
                 informaAltura(arvore, altura);
-                end;
+            end;
             7: begin
-            		qtdFolhas := 0;
+                qtdFolhas := 0;
                 informaFolhas(arvore, qtdFolhas);
                 informaQtdFolhas(qtdFolhas);
-                end;
+            end;
             8: begin
-            		altura := 0;
+                altura := 0;
                 calculaAltura(arvore, altura);
                 informaCompleta(arvore, completa, altura);
-            		end;
+            end;
             9: begin
                 lerValor(valor);
                 informaRemovido(arvore, valor, removido);
-            		end;
+                balancoArvore(arvore);
+                colorirArvore(arvore, arvore);
+            end;
         end;
         
         writeln('<Enter> para continuar');
